@@ -7,6 +7,9 @@
 #include <ATen/native/quantized/cpu/qnnpack_utils.h>
 #include <ATen/native/quantized/cpu/quant_utils.h>
 #include <ATen/native/quantized/cpu/conv_packed_params.h>
+#include <torch/custom_class.h>
+#include <torch/csrc/jit/runtime/custom_operator.h>
+#include <torch/csrc/jit/runtime/operator.h>
 
 #ifdef USE_FBGEMM
 template <int kSpatialDim>
@@ -264,6 +267,16 @@ unpack_quantized_prepacked_sizes_conv2d(const IValue& ivalue) {
       params->dilation(),
       params->groups()));
 }
+
+torch::jit::RegisterOperators reg(
+    {torch::jit::OperatorGenerator(
+         TORCH_SELECTIVE_SCHEMA("quantized::conv2d_unpack_sizes(Any W_prepack) -> ((int[], int[]?, int[], int[], int[], int))"),
+          [](Stack* stack) {
+            auto w = torch::jit::pop(stack);
+            torch::jit::push(stack, unpack_quantized_prepacked_sizes_conv2d(w));
+          },
+         c10::AliasAnalysisKind::FROM_SCHEMA)
+     });
 
 TORCH_LIBRARY_IMPL(quantized, CatchAll, m) {
   // conv_unpack is deprecated, please use conv2d_unpack for 2D conv.
