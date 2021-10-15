@@ -17,6 +17,7 @@
 #include <torch/csrc/jit/serialization/import_export_helpers.h>
 #include <torch/csrc/jit/serialization/onnx.h>
 #include <torch/csrc/onnx/onnx.h>
+#include <atomic>
 
 #include <onnx/checker.h>
 #include <onnx/onnx_pb.h>
@@ -932,7 +933,18 @@ void GraphEncoder::EncodeTensor(
   }
 }
 
+auto& mobileInterfaceCallExport() {
+  static std::atomic<bool> flag{false};
+  return flag;
+}
 } // namespace
+
+TORCH_API void enableMobileInterfaceCallExport() {
+  mobileInterfaceCallExport().store(true, std::memory_order_relaxed);
+}
+bool getMobileInterfaceCallExport() {
+  return mobileInterfaceCallExport().load(std::memory_order_relaxed);
+}
 
 std::string pretty_print_onnx(
     const std::shared_ptr<Graph>& graph,
