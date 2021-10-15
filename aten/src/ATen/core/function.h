@@ -1,8 +1,10 @@
 #pragma once
+
 #include <ATen/core/function_schema.h>
 #include <ATen/core/ivalue.h>
 #include <ATen/core/qualified_name.h>
-#include <mutex>
+#include <c10/util/Exception.h>
+#include <c10/util/FunctionRef.h>
 
 namespace c10 {
 struct FunctionSchema;
@@ -16,7 +18,11 @@ namespace torch {
 namespace jit {
 
 struct Graph;
-struct GraphExecutor;
+struct Code;
+
+namespace mobile {
+struct Code;
+}
 
 using Stack = std::vector<at::IValue>;
 using Kwargs = std::unordered_map<std::string, at::IValue>;
@@ -62,13 +68,19 @@ struct TORCH_API Function {
   // if this isn't yet defined, run its method_creator function
   virtual void ensure_defined() = 0;
 
-  virtual GraphExecutor& get_executor() = 0;
-
   virtual const c10::FunctionSchema& getSchema() const = 0;
 
   virtual size_t num_inputs() const = 0;
 
   virtual Function& setSchema(c10::FunctionSchema schema) = 0;
+
+  virtual void call(Stack&, size_t, c10::function_ref<void(const Code&)>) {
+    TORCH_INTERNAL_ASSERT_DEBUG_ONLY(false);
+  }
+
+  virtual void call(Stack&, c10::function_ref<void(const mobile::Code&)>) {
+    TORCH_INTERNAL_ASSERT_DEBUG_ONLY(false);
+  }
 
   virtual ~Function() {}
 };
