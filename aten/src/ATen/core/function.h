@@ -36,8 +36,8 @@ TORCH_API void preoptimizeGraph(std::shared_ptr<Graph>& graph);
 // execution of the function. Method is a wrapper around an
 // underlying Function that also provides a `self` object.
 struct TORCH_API Function {
-  virtual const std::string& doc_string() const {
-    static const std::string no_doc_string = "";
+  virtual c10::string_view doc_string() const {
+    static constexpr c10::string_view no_doc_string = "";
     return no_doc_string;
   }
 
