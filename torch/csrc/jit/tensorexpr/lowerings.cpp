@@ -1517,6 +1517,10 @@ RegisterNNCLoweringsFunction quantized_add(
     {"quantized::add(Tensor qa, Tensor qb, float scale, int zero_point) -> (Tensor qc)"},
     computeQuantizedAdd);
 
+RegisterNNCLoweringsFunction quantized_conv2d_prepack(
+		{"_quantized::conv2d_prepack(Tensor weight, Tensor? bias, int[] stride, int[] padding, int[] dilation, int groups) -> (__torch__.torch.classes.quantized.Conv2dPackedParamsBase)"},
+    computeQuantizedConv2dPrepack);
+
 RegisterNNCLoweringsFunction aten_upsample_nearest2d(
     {"aten::upsample_nearest2d.vec(Tensor input, int[]? output_size, float[]? scale_factors) -> (Tensor)"},
     computeUpsampleNearest2d);
