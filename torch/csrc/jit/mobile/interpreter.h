@@ -35,7 +35,7 @@ struct InterpreterState {
  private:
   void enterFrame(const Code&);
   void leaveFrame();
-  void saveExceptionDebugHandle();
+  void saveExceptionDebugHandles();
 
   c10::IValue& reg(size_t reg);
   std::vector<c10::IValue> registers_;
@@ -49,7 +49,7 @@ struct InterpreterState {
 // Note that this is set only when exception occurs.
 // since this is a thread local variable and setting it for
 // every instruction will add overhead of thread local variable access.
-DebugHandle getInterpretersExceptionDebugHandle();
+const std::vector<DebugHandle>& getInterpretersExceptionDebugHandles();
 } // namespace mobile
 } // namespace jit
 } // namespace torch
